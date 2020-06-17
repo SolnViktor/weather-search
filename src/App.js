@@ -1,26 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import Container from "@material-ui/core/Container";
+import styles from './App.module.scss'
+import {SearchFormContainer} from "./searchForm/SearchForm";
+import {WeatherDescriptionContainer} from "./weatherDescription/WeatherDescription";
+import {Preloader} from "./accets/preloader/Preloader";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+function App(props) {
+
+
+    return (
+        <div className={styles.app}>
+            {/*<Preloader />*/}
+            <Container width="1200px">
+                <div className={styles.mainContent}>
+                    <div className={styles.title}>
+                        <h1>Weather search</h1>
+                    </div>
+                    <SearchFormContainer/>
+                    <WeatherDescriptionContainer/>
+                </div>
+            </Container>
+        </div>
+    );
 }
+
+
 
 export default App;
