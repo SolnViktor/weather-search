@@ -5,13 +5,13 @@ import * as serviceWorker from './serviceWorker';
 import 'fontsource-roboto';
 import {Provider} from "react-redux";
 import store from "./redux/store";
-import App from "./App";
+import AppContainer from "./App";
 
 
 ReactDOM.render(
     <Provider store={store}>
         <React.StrictMode>
-            <App />
+            <AppContainer />
         </React.StrictMode>
     </Provider>,
     document.getElementById('root')

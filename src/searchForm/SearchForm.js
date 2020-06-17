@@ -1,9 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./SearchForm.module.scss";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {connect} from "react-redux";
-import {addCity, getWeather} from "../redux/weather-reducer";
+import {addCity, errorHandler, getWeather} from "../redux/weather-reducer";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 
@@ -11,30 +11,41 @@ export const SearchForm = (props) => {
 
     let [input, setInput] = useState('');
 
+    useEffect(() => {
+        const data = localStorage.getItem('cities')
+        if(data) {
+            const dataCities = JSON.parse(data);
+            props.addCity(dataCities);
+        }
 
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('cities', JSON.stringify(props.cities));
+    }, [props.cities])
 
     const onChangeHandler = (e) => {
         setInput(e.currentTarget.value)
+        props.errorHandler(false);
+    }
+
+
+    const setCity = () => {
+        let trimmedCity = input.trim();
+        if(trimmedCity !== '') {
+            props.addCity([trimmedCity]);
+            props.getWeather(trimmedCity);
+            setInput('');
+        } else props.errorHandler(true)
+
     }
     const enterValueOnKeyPress = (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault();
-            let trimmedValue = input.trim();
-            setInput('');
-            props.addCity(trimmedValue);
-            props.getWeather(trimmedValue);
-            localStorage.setItem(trimmedValue, trimmedValue);
-
+            setCity();
         }
     }
     const enterValueOnClick = () => {
-        let trimmedValue = input.trim();
-
-        props.addCity(trimmedValue);
-        props.getWeather(trimmedValue);
-        localStorage.setItem(trimmedValue, trimmedValue);
-        setInput('');
-
+        setCity();
     }
 
 
@@ -47,10 +58,10 @@ export const SearchForm = (props) => {
                 options={props.cities}
                 renderInput={(params) => (
                     <TextField {...params}
+                               error={props.isError}
                                onKeyPress={enterValueOnKeyPress}
                                onChange={onChangeHandler} className={styles.input}
                                id="outlined-basic" label="Enter a city" variant="outlined" value={input}/>
-
                 )}
             />
             <Button className={styles.btn} onClick={enterValueOnClick} variant="contained" color="primary">
@@ -59,16 +70,11 @@ export const SearchForm = (props) => {
         </div>
     )
 }
-// <TextField onKeyPress={enterValueOnKeyPress}
-//            options={["samara", "moscow", "london", "carrot"]}
-//            autoComplete='on'
-//            name='on'
-//            autoCorrect={'on'}
-//            onChange={onChangeHandler} className={styles.input}
-//            id="outlined-basic" label="Enter a city" variant="outlined" value={input}/>
+
 
 let mapStateToProps = (state) => ({
     cities: state.weather.cities,
+    isError: state.weather.isError,
 });
 
-export const SearchFormContainer = connect(mapStateToProps, {getWeather, addCity})(SearchForm)
+export const SearchFormContainer = connect(mapStateToProps, {getWeather, addCity, errorHandler})(SearchForm)

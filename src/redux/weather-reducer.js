@@ -2,9 +2,13 @@ import {weatherAPI} from "../api/api";
 
 const ADD_CITY = 'weather-reducer/ADD_CITY';
 const UPDATE_WEATHER = 'weather-reducer/UPDATE_WEATHER';
+const IS_FETCHING = 'weather-reducer/IS_FETCHING';
+const IS_ERROR = 'weather-reducer/IS_ERROR';
 
 let initialState = {
     cities: [],
+    isFetching: false,
+    isError: false,
     currentWeather: [
         {
             "coord": {
@@ -56,14 +60,26 @@ let initialState = {
 function weatherReducer(state = initialState, action) {
     switch (action.type) {
         case ADD_CITY:
-            return {
-                ...state,
-                cities: [...state.cities, action.payload]
-            }
+            if (action.payload) {
+                return {
+                    ...state,
+                    cities: [...state.cities, ...action.payload]
+                }
+            } else return state
         case UPDATE_WEATHER:
             return {
                 ...state,
                 currentWeather: [...state.currentWeather, action.payload.data]
+            }
+        case IS_FETCHING:
+            return {
+                ...state,
+                isFetching: action.payload
+            }
+        case IS_ERROR:
+            return {
+                ...state,
+                isError: action.payload
             }
         default:
             return state;
@@ -72,13 +88,18 @@ function weatherReducer(state = initialState, action) {
 
 export const addCity = (city) => ({type: ADD_CITY, payload: city});
 export const updateWeather = (payload) => ({type: UPDATE_WEATHER, payload});
+export const isFetching = (payload) => ({type: IS_FETCHING, payload});
+export const errorHandler = (payload) => ({type: IS_ERROR, payload})
 
 export const getWeather = (city) => async (dispatch) => {
     try {
+        dispatch(isFetching(true));
         let response = await weatherAPI.getWeatherForCity(city);
         dispatch(updateWeather(response));
+        dispatch(isFetching(false));
     } catch (error) {
-        alert("Something wrong")
+        dispatch(errorHandler(true));
+        dispatch(isFetching(false));
     }
 
 }
