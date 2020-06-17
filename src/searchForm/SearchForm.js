@@ -13,7 +13,7 @@ export const SearchForm = (props) => {
 
     useEffect(() => {
         const data = localStorage.getItem('cities')
-        if(data) {
+        if (data) {
             const dataCities = JSON.parse(data);
             props.addCity(dataCities);
         }
@@ -28,11 +28,14 @@ export const SearchForm = (props) => {
         setInput(e.currentTarget.value)
         props.errorHandler(false);
     }
+    const onFocusHandler = () => {
+        props.errorHandler(false);
+    }
 
 
     const setCity = () => {
         let trimmedCity = input.trim();
-        if(trimmedCity !== '') {
+        if (trimmedCity !== '') {
             props.addCity([trimmedCity]);
             props.getWeather(trimmedCity);
             setInput('');
@@ -53,6 +56,11 @@ export const SearchForm = (props) => {
         <div className={styles.container}>
             <Autocomplete
                 className={styles.input}
+                onInputChange={(event, newInputValue) => {
+                    setInput(newInputValue);
+                }}
+
+
                 id="Enter a city"
                 freeSolo
                 options={props.cities}
@@ -60,8 +68,11 @@ export const SearchForm = (props) => {
                     <TextField {...params}
                                error={props.isError}
                                onKeyPress={enterValueOnKeyPress}
-                               onChange={onChangeHandler} className={styles.input}
-                               id="outlined-basic" label="Enter a city" variant="outlined" value={input}/>
+                               onChange={onChangeHandler}
+                               className={styles.input}
+                               onFocus={onFocusHandler}
+                               id="outlined-basic" label="Enter a city" variant="outlined"
+                    />
                 )}
             />
             <Button className={styles.btn} onClick={enterValueOnClick} variant="contained" color="primary">
